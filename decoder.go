@@ -4,6 +4,10 @@ package fdkaac
 #cgo CFLAGS: -I./fdk-aac/libAACdec/include -I./fdk-aac/libSYS/include
 #cgo LDFLAGS: ${SRCDIR}/fdk-aac/libs/libfdk-aac.a -lm
 #include "aacdecoder_lib.h"
+
+AAC_DECODER_ERROR aacDecoder_Fill_CGO(HANDLE_AACDECODER handle, UCHAR *buf, const UINT *len, UINT *bytesValid) {
+	return aacDecoder_Fill(handle, &buf, len, bytesValid);
+}
 */
 import "C"
 
@@ -48,7 +52,7 @@ func (d *Decoder) Fill(data []byte) (int, error) {
 	inLen := C.uint(len(data))
 	bytesValid := inLen
 
-	err := C.aacDecoder_Fill(d.handle, &dataPointer, &inLen, &bytesValid)
+	err := C.aacDecoder_Fill_CGO(d.handle, dataPointer, &inLen, &bytesValid)
 	if err != C.AAC_DEC_OK {
 		return 0, fmt.Errorf("failed to fill internal buffer %v", err)
 	}
